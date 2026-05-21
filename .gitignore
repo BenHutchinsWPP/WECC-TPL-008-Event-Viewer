@@ -1,0 +1,48 @@
+# Secrets, env, venv
+api_keys.py
+.env
+.env.*
+venv/
+
+# Regenerable transmission intermediate
+*.geojsonl
+.venv/
+
+# Python artifacts
+*.py[cod]
+__pycache__/
+.pytest_cache/
+
+# Dev server
+server.out
+server.err
+*.log
+
+# Editors
+.vscode/
+*.code-workspace
+
+# Raw Copernicus downloads (GRIB) and sidecars
+/Copernicus Data/
+*.grib
+*.idx
+*.nc
+*.zip
+
+# Intermediate: single-day weather packs (superseded by 3-day merged packs)
+/data/weather/*.json
+/data/weather/t2m/*.i16.bin
+/data/weather/t2m/*.i16.bin.gz
+
+# Keep 3-day merged packs (final dashboard deliverable)
+!/data/weather/*.3day.json
+!/data/weather/t2m/*.3day.i16.bin
+!/data/weather/t2m/*.3day.i16.bin.gz
+
+# Deprecated solar packs
+/data/weather/solar/
+
+*.bak
+_Archive/
+*.kmz
+*.kml

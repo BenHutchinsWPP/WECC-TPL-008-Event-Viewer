@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NERC TPL-008 Extreme Weather Event Library Viewer</title>
+  <link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet">
+  <link href="assets/style.css?v=2026-05-15-tpl-regions" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <a href="https://www.westernpowerpool.org/"><img id="logo" src="assets/WPP-Logo-Circle.png" alt="WPP"></a>
+        <h1>NERC TPL-008 Extreme Weather Event Library Viewer</h1>
+      </div>
+      <div class="header-actions">
+        <details class="csv-download">
+          <summary>NERC Library - Merged CSV Downloads</summary>
+          <div class="csv-menu">
+            <a href="NERC%20Library/Top40.csv" download>Download Top40.csv</a>
+            <a href="NERC%20Library/Top20.csv" download>Download Top20.csv</a>
+            <a href="NERC%20Library/Daily.csv" download>Download Daily.csv</a>
+            <a href="NERC%20Library/Hourly.csv" download>Download Hourly.csv</a>
+          </div>
+        </details>
+        <button class="info-button" id="infoButton" type="button" aria-label="Data credits">i</button>
+        <div class="status" id="status"><span class="loader" id="loader" hidden></span> <span id="statusText">Loading events…</span></div>
+        <div id="errorBanner" class="error-banner" hidden></div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="library">
+        <div class="filters">
+          <div class="filter-actions">
+            <button id="clearRegions" type="button">All regions</button>
+            <select id="eventTypeFilter" aria-label="Event type">
+              <option value="all">Heat and cold events</option>
+              <option value="heat">Heat events</option>
+              <option value="cold">Cold events</option>
+            </select>
+            <div class="row-count-button" id="rowCountButton">0 dates</div>
+          </div>
+          <div class="region-list" id="regionList"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-sort="date">Date<div class="col-resizer"></div></th>
+                <th data-sort="Region">Region<div class="col-resizer"></div></th>
+                <th data-sort="Event_Type">Event_Type<div class="col-resizer"></div></th>
+                <th data-sort="Event_Temp" title="Temperatures are in the same order as the Regions column. Temperatures from NERC Library (See CSVs).">Event_Temp<div class="col-resizer"></div></th>
+                <!-- <th>Weather</th> -->
+              </tr>
+            </thead>
+            <tbody id="eventRows"></tbody>
+          </table>
+        </div>
+        <div class="chart-resizer" id="chartResizer" aria-hidden="true"></div>
+        <div class="spot-panel" id="spotPanel">
+          <div class="spot-header">
+            <div id="spotTitle">Selected point</div>
+            <div class="spot-actions">
+              <button id="downloadSpotCsv" type="button">CSV</button>
+              <button id="closeSpot" type="button" aria-label="Close plot">x</button>
+            </div>
+          </div>
+          <div class="chart-body">
+            <canvas id="spotChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <div class="resizer" id="paneResizer" aria-hidden="true"></div>
+
+      <section class="viewer">
+        <div id="map"></div>
+        <div class="map-search">
+          <input id="mapSearchInput" type="search" placeholder="Search a place">
+          <button id="mapSearchButton" type="button">Search</button>
+          <button id="toggleTplRegions" type="button">TPL-008 Regions</button>
+          <button id="toggleSubstations" type="button" class="primary">Subs</button>
+        </div>
+        <canvas id="weatherCanvas" width="357" height="241"></canvas>
+        <div class="map-overlay-info">
+          <div class="readout" id="readout">No date selected</div>
+          <div class="legend" id="legend">
+            <div class="legend-bar" id="legendBar"></div>
+            <div class="legend-labels" id="legendLabels">
+              <span>-40 degF</span><span>32 degF</span><span>120 degF</span>
+            </div>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="primary" id="playButton" type="button">Play</button>
+          <select id="fieldSelect" aria-label="Weather field">
+            <option value="temperature">Temperature</option>
+            <!-- Wind/solar hidden for TPL-008 temperature focus. Re-enable when data exists.
+            <option value="wind_speed">Wind speed</option>
+            <option value="surface_solar_radiation_downwards">Solar</option>
+            -->
+          </select>
+          <div class="time-track">
+            <div class="extreme-markers" id="extremeMarkers"></div>
+            <input id="hourSlider" type="range" min="0" max="23" value="0">
+          </div>
+          <div class="hour-label" id="hourLabel">00:00</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+
+
+  <dialog class="credits-dialog" id="creditsDialog">
+    <div class="credits-content">
+      <div class="credits-header">
+        <h2>Data Credits</h2>
+        <button id="closeCredits" type="button" aria-label="Close credits">x</button>
+      </div>
+      <p>This viewer combines public benchmark event data, weather reanalysis data, open map software, and public map layers.</p>
+      <ul>
+        <li><a href="https://www.nerc.com/globalassets/standards/reliability-standards/tpl/tpl-008-1.pdf" target="_blank" rel="noopener">NERC TPL-008-1 Reliability Standard</a> and <a href="https://www.nerc.com/globalassets/standards/reliability-standards/tpl/tpl-008-1_benchmark_temperature_events_april_2025.pdf" target="_blank" rel="noopener">TPL-008-1 Benchmark Temperature Events, April 2025</a>.</li>
+        <li><a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels" target="_blank" rel="noopener">Copernicus Climate Data Store ERA5 hourly data on single levels from 1940 to present</a>. The results contain modified Copernicus Climate Change Service information.</li>
+        <li><a href="https://www.arcgis.com/home/item.html?id=83f3a587c78a4d0cbbf10f6586b5e2b1" target="_blank" rel="noopener">WECC Balancing Authorities</a> boundary layer.</li>
+        <li><a href="https://maplibre.org/maplibre-gl-js/docs/" target="_blank" rel="noopener">MapLibre GL JS</a> for map rendering and <a href="https://www.chartjs.org/" target="_blank" rel="noopener">Chart.js</a> for charts.</li>
+        <li><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> for base map data, tiles, <a href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener">Nominatim</a> for place search, and infrastructure data (transmission lines, substations, generators). Processed with <a href="https://github.com/openinframap/openinframap" target="_blank" rel="noopener">OpenInfraMap</a> tagging patterns.</li>
+        <li>Warranty: None! Use at your own risk. Weather data estimated. TPL-008 regions are approximated for display purposes. BA overlay is approximated for visual effect. </li>
+      </ul>
+    </div>
+  </dialog>
+
+  <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/pmtiles@3/dist/pmtiles.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="assets/state.js?v=2026-05-19-transmission"></script>
+  <script src="assets/events.js?v=2026-05-19-transmission"></script>
+  <script src="assets/weather.js?v=2026-05-19-transmission"></script>
+  <script src="assets/map.js?v=2026-05-19-transmission"></script>
+  <script src="assets/charts.js?v=2026-05-19-transmission"></script>
+  <script src="assets/ui.js?v=2026-05-19-transmission"></script>
+  <script>
+    // Inline init only
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# TPL-008 Extreme Weather Event Library Viewer
+# Python 3.11+ recommended
+
+# Data processing
+numpy>=1.24,<2.0
+pandas>=2.0,<3.0
+xarray>=2024.0
+cfgrib>=0.9
+eccodes>=2.0
+
+# Spatial
+shapely>=2.0
+
+# CDS API (Copernicus Data Store)
+cdsapi>=0.7
+
+# Development / linting
+# ruff>=0.3
+# mypy>=1.8
